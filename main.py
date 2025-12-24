@@ -12,30 +12,34 @@ load_dotenv()
 api_key = os.environ.get("GROQ_API_KEY")
 client = Groq(api_key=api_key)
 
-@st.cache_data(ttl=300)  # 5 dk cache
+@st.cache_data(ttl=300) #5dk
 def realtime_search(query):
-    """Gerçek zamanlı web arama - Güncel sonuçlar"""
     try:
         with DDGS() as ddgs:
+            # Filtreleri biraz gevşetiyoruz (timelimit='d' yaparak son 24 saate çekiyoruz)
             results = list(ddgs.text(
                 query, 
-                max_results=10,
-                timelimit='h',  # Son saatler (real-time)
-                region='wt-wt',
-                freshness='A'   # En güncel
+                max_results=8,
+                timelimit='d',  # 'h' yerine 'd' (günlük) daha garantidir
+                region='wt-wt'
             ))
         
         if not results:
-            return "❌ Gerçek zamanlı sonuç bulunamadı."
+            return "❌ Sonuç bulunamadı. Lütfen farklı anahtar kelimeler deneyin."
         
-        # En iyi 6 sonuç
-        return "\n".join([
-            f"**{r['title']}** ({datetime.now().strftime('%H:%M')})\n"
-            f"{r['body'][:300]}...\n🔗 {r['href']}\n{'─'*90}"
-            for r in results[:6]
-        ])
-    except:
-        return "❌ Arama hatası."
+        formatted_results = []
+        for r in results[:6]:
+            # r.get() kullanarak hata payını azaltıyoruz
+            title = r.get('title', 'Başlıksız')
+            body = r.get('body', 'İçerik yok')
+            link = r.get('href', '#')
+            formatted_results.append(f"**{title}**\n{body[:300]}...\n🔗 {link}\n{'─'*90}")
+            
+        return "\n".join(formatted_results)
+    except Exception as e:
+        # Hatanın ne olduğunu görmek için terminale yazdırıyoruz
+        print(f"Arama Hatası Detayı: {e}")
+        return "❌ Arama motoruna şu an ulaşılamıyor. Lütfen bir dakika sonra tekrar deneyin."
 
 def agent_analysis(search_results, query):
     """AI ajan analizi"""
