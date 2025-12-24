@@ -20,8 +20,7 @@ def realtime_search(query):
             results = list(ddgs.text(
                 query, 
                 max_results=8,
-                timelimit='d',  # 'h' yerine 'd' (günlük) daha garantidir
-                region='wt-wt'
+                timelimit='m',  #m monthly
             ))
         
         if not results:
@@ -52,7 +51,7 @@ TÜZEL SONUÇLAR ({datetime.now().strftime('%Y-%m-%d %H:%M')}):
 
 📋 GÖREV: 
 1. En güncel bilgileri özetle
-2. Kaynakları belirt 
+2. Kullandığın bilgilerin yanına mutlaka [1], [2] şeklinde rakam koy ve cevabın en sonunda bu rakamların hangi linke (URL) ait olduğunu 'Kaynaklar:' başlığı altında listele. 
 3. 3 cümleden fazla yazma
 4. Gerçek zamanlı veriye odaklan
 
