@@ -117,6 +117,6 @@ else:
     
     st.markdown("### 🚀 Hızlı Başlatma")
     st.code("""
-pip install streamlit groq duckduckgo-search
+pip install streamlit groq duckduckgo-search python-dotenv
 streamlit run app.py
     """)
